@@ -37,9 +37,7 @@
 
 2. DeepDanbooru のサブモジュールとして `similar-image-search` をクローンします。
 
-   ```bash
-   git clone https://github.com/SaeKazamatsuri/similar-image-search.git
-   ```
+   - git clone https://github.com/SaeKazamatsuri/similar-image-search.git
 
 3. 必要な Python パッケージをインストールします。
 
