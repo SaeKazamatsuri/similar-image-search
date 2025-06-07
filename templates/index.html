@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>類似画像検索</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            display: block;
+            margin-bottom: 10px;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #f0f0f0;
+        }
+
+        .preview img,
+        .results img {
+            max-width: 70%;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .result-item {
+            text-align: center;
+        }
+
+        .result-item p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .flash {
+            color: red;
+            margin-bottom: 10px;
+        }
+
+        .demo-gallery img {
+            cursor: grab;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>
+            <a href="/" style="color: black;">類似画像検索</a>
+        </h1>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="flash">
+            {% for msg in messages %}
+            <p>{{ msg }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="post" action="{{ url_for('upload_file') }}" enctype="multipart/form-data">
+            <label for="file">画像ファイルを選択 (PNG, JPG, GIF):</label>
+            <input type="file" name="file" id="file" required>
+            <button type="submit">アップロードして検索</button>
+        </form>
+
+        {% if query_image %}
+        <div class="preview">
+            <h2>アップロード画像</h2>
+            <img src="{{ url_for('static', filename='tmp/' + query_image) }}" alt="Uploaded Image">
+        </div>
+        {% endif %}
+
+        {% if results %}
+        <h2>類似画像トップ5</h2>
+        <div class="results">
+            {% for fname, score in results %}
+            <div class="result-item">
+                <img src="{{ url_for('static', filename='images/' + fname) }}" alt="Similar Image">
+                <p>ファイル名: {{ fname }}</p>
+                <p>類似度: {{ '{:.3f}'.format(score) }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <h2>デモ画像から選択</h2>
+        <div class="results demo-gallery">
+            {% for demo in demo_images %}
+            <div class="result-item">
+                <img src="{{ url_for('static', filename='demo_img/' + demo) }}" alt="{{ demo }}" draggable="true"
+                    data-url="{{ url_for('static', filename='demo_img/' + demo) }}" ondragstart="onDragStart(event)">
+                <p>{{ demo }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('file');
+
+        // ファイルのURLをBlobに変換して input[type=file] にセット
+        async function fetchAndAssignFile(url, filename) {
+            const res = await fetch(url);
+            const blob = await res.blob();
+            const file = new File([blob], filename, { type: blob.type });
+
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            fileInput.files = dt.files;
+        }
+
+        // 画像ドラッグ処理
+        function onDragStart(event) {
+            const imageUrl = event.target.dataset.url;
+            event.dataTransfer.setData("text/plain", imageUrl);
+        }
+
+
+        // ドロップ処理
+        fileInput.addEventListener("dragover", (e) => {
+            e.preventDefault();
+        });
+
+        fileInput.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const url = e.dataTransfer.getData("text/plain");
+            const filename = url.split('/').pop();
+            fetchAndAssignFile(url, filename);
+        });
+    </script>
+</body>
+
+</html>
