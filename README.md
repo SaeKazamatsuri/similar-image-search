@@ -37,7 +37,9 @@
 
 2. DeepDanbooru のサブモジュールとして `similar-image-search` をクローンします。
 
-   - git clone https://github.com/SaeKazamatsuri/similar-image-search.git
+   ```bash
+   git clone https://github.com/SaeKazamatsuri/similar-image-search.git
+   ```
 
 3. 必要な Python パッケージをインストールします。
 
@@ -61,9 +63,8 @@
 
 6. ブラウザで以下の URL にアクセスします。
 
-   ```
-    [http://127.0.0.1:5002/](http://127.0.0.1:5002/)
-    ```
+- [http://127.0.0.1:5002/](http://127.0.0.1:5002/)
+
 
 7. 画像をアップロードすると、上位 5 件の類似画像が表示されます。
 
